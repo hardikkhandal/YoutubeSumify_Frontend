@@ -1,9 +1,90 @@
 const VERCEL_API_BASE_URL = "http://localhost:3000";
 
+// function addCustomButton() {
+//   console.log("Attempting to add custom button.");
+
+//   // Check if the button is already added
+//   if (document.querySelector("#custom-action-button")) {
+//     console.log("Custom button already exists.");
+//     return;
+//   }
+
+//   // Select the target node
+//   var targetNode = document.querySelector("#top-level-buttons-computed");
+//   console.log("Target node:", targetNode);
+
+//   if (targetNode) {
+//     var customButton = document.createElement("button");
+//     customButton.innerText = "Summarize Video";
+//     customButton.id = "custom-action-button";
+
+//     // Ensure the button is styled to be visible
+//     customButton.style.backgroundColor = "red";
+//     customButton.style.color = "white";
+//     customButton.style.border = "none";
+//     customButton.style.padding = "10px 20px";
+//     customButton.style.margin = "5px";
+//     customButton.style.cursor = "pointer";
+//     customButton.style.fontSize = "14px";
+//     customButton.style.zIndex = "9999";
+//     customButton.style.border = "1px solid red";
+//     customButton.style.borderRadius = "15px";
+
+//     customButton.onclick = function () {
+//       console.log(
+//         "Custom button clicked, sending message to background script."
+//       );
+//       const videoUrl = window.location.href;
+//       chrome.runtime.sendMessage(
+//         { action: "summarize", videoUrl: videoUrl },
+//         (response) => {
+//           console.log("Message sent to background script, response:", response);
+//         }
+//       );
+//     };
+
+//     // Append the custom button to the target node
+//     targetNode.appendChild(customButton);
+//     console.log("Custom button added.");
+//     console.log("Custom button HTML:", customButton.outerHTML);
+
+//     // Add the "Show Summary" button adjacent to the "Summarize Video" button
+//     var showSummaryButton = document.createElement("button");
+//     showSummaryButton.innerText = "Show Summary";
+//     showSummaryButton.id = "show-summary-button";
+//     showSummaryButton.style.backgroundColor = "blue";
+//     showSummaryButton.style.color = "white";
+//     showSummaryButton.style.border = "none";
+//     showSummaryButton.style.padding = "10px 20px";
+//     showSummaryButton.style.margin = "5px";
+//     showSummaryButton.style.cursor = "pointer";
+//     showSummaryButton.style.fontSize = "14px";
+//     showSummaryButton.style.zIndex = "9999";
+//     showSummaryButton.style.border = "1px solid #ccc";
+//     showSummaryButton.style.borderRadius = "15px";
+
+//     showSummaryButton.onclick = function () {
+//       console.log("Show Summary button clicked.");
+//       var summaryContainer = document.querySelector("#summary-container");
+//       if (summaryContainer) {
+//         summaryContainer.style.display = "block";
+//       }
+//     };
+
+//     // Append the "Show Summary" button to the target node
+//     targetNode.appendChild(showSummaryButton);
+//     console.log("Show Summary button added.");
+//     console.log("Show Summary button HTML:", showSummaryButton.outerHTML);
+//   } else {
+//     console.error("Target node not found!");
+//   }
+// }
+
+// Function to add the summary container
 function addCustomButton() {
   console.log("Attempting to add custom button.");
 
-  // Check if the button is already added
+  // Check if the buttons are already added
   if (document.querySelector("#custom-action-button")) {
     console.log("Custom button already exists.");
     return;
@@ -14,11 +95,10 @@ function addCustomButton() {
   console.log("Target node:", targetNode);
 
   if (targetNode) {
+    // Summarize Video button
     var customButton = document.createElement("button");
     customButton.innerText = "Summarize Video";
     customButton.id = "custom-action-button";
-
-    // Ensure the button is styled to be visible
     customButton.style.backgroundColor = "red";
     customButton.style.color = "white";
     customButton.style.border = "none";
@@ -43,12 +123,11 @@ function addCustomButton() {
       );
     };
 
-    // Append the custom button to the target node
+    // Append Summarize Video button
     targetNode.appendChild(customButton);
     console.log("Custom button added.");
-    console.log("Custom button HTML:", customButton.outerHTML);
 
-    // Add the "Show Summary" button adjacent to the "Summarize Video" button
+    // Show Summary button
     var showSummaryButton = document.createElement("button");
     showSummaryButton.innerText = "Show Summary";
     showSummaryButton.id = "show-summary-button";
@@ -71,16 +150,62 @@ function addCustomButton() {
       }
     };
 
-    // Append the "Show Summary" button to the target node
+    // Append Show Summary button
     targetNode.appendChild(showSummaryButton);
     console.log("Show Summary button added.");
-    console.log("Show Summary button HTML:", showSummaryButton.outerHTML);
+
+    // Add "Download Summary" button
+    var downloadSummaryButton = document.createElement("button");
+    downloadSummaryButton.innerText = "Download Summary";
+    downloadSummaryButton.id = "download-summary-button";
+    downloadSummaryButton.style.backgroundColor = "green";
+    downloadSummaryButton.style.color = "white";
+    downloadSummaryButton.style.border = "none";
+    downloadSummaryButton.style.padding = "10px 20px";
+    downloadSummaryButton.style.margin = "5px";
+    downloadSummaryButton.style.cursor = "pointer";
+    downloadSummaryButton.style.fontSize = "14px";
+    downloadSummaryButton.style.zIndex = "9999";
+    downloadSummaryButton.style.border = "1px solid green";
+    downloadSummaryButton.style.borderRadius = "15px";
+
+    // Define action for Download Summary button
+    downloadSummaryButton.onclick = function () {
+      console.log("Download Summary button clicked.");
+      var summaryContent = document.querySelector("#summary-content");
+      if (summaryContent) {
+        var summaryText = summaryContent.innerText;
+        downloadTextFile("video_summary.txt", summaryText);
+      } else {
+        console.error("Summary content not found!");
+      }
+    };
+
+    // Append Download Summary button
+    targetNode.appendChild(downloadSummaryButton);
+    console.log("Download Summary button added.");
   } else {
     console.error("Target node not found!");
   }
 }
 
-// Function to add the summary container
+// Function to download a text file
+function downloadTextFile(filename, text) {
+  var element = document.createElement("a");
+  element.setAttribute(
+    "href",
+    "data:text/plain;charset=utf-8," + encodeURIComponent(text)
+  );
+  element.setAttribute("download", filename);
+
+  element.style.display = "none";
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
 function addSummaryContainer() {
   // Check if the summary container already exists
   if (document.querySelector("#summary-container")) {
